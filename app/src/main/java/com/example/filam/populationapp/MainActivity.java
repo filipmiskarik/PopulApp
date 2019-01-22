@@ -72,4 +72,10 @@ String responseStr;
         intent.putExtra("response", responseStr);
         startActivity(intent);
     }
+    public void YearAgeIntent(View view)
+    {
+        Intent intent = new Intent(this, PopulationByYearAge.class);
+        intent.putExtra("response", responseStr);
+        startActivity(intent);
+    }
 }

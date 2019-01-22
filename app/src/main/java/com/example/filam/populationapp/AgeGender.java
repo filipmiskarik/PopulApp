@@ -58,7 +58,7 @@ TextView textView;
         days = tmp.toArray(days);
         loadSpinner(days, daySpinner);
 
-        String[] genders = {"Male","Female","Unisex"};
+        String[] genders = {"Male","Female"};
         loadSpinner(genders, genderSpinner);
 
         final String[] months = {"January","February","March","April","May","June","July","August","September","October","November","December"};
@@ -183,7 +183,7 @@ TextView textView;
                         gender = gender.toLowerCase();
                         OkHttpClient client = new OkHttpClient();
                         com.squareup.okhttp.Request request = new Request.Builder()
-                                .url("http://api.population.io:80/1.0/wp-rank/"+ year +"-"+ monthInt +"-"+ day +"/"+ gender +"/"+ countr +"/today/")
+                                .url("http://api.population.io:80/1.0/life-expectancy/total/"+gender+"/"+ countr +"/"+ year +"-"+ monthInt +"-"+ day +"/")
                                 .build();
                         Response response = null;
 
@@ -203,11 +203,10 @@ TextView textView;
                         String resp = o.toString();
                         try {
                             JSONObject object = new JSONObject(resp);
-                            int population = object.getInt("rank");
-                            if (gender == "unisex"){
-                                gender = "human";
-                            }
-                            textView.setText("In "+ year + "-" + month + "-"+ day + " in " + country + " lived " + "" + population + " " + gender +"s");
+                            int expectancy = object.getInt("total_life_expectancy");
+
+                            textView.setText("The total life expectancy of " + gender + "s with birthday on "
+                                    + year + "-" + month + "-" + day + " in " + country + " is " + expectancy);
                         }
                         catch(JSONException e){
                             e.printStackTrace();
