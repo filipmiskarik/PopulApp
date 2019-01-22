@@ -1,12 +1,12 @@
 package com.example.filam.populationapp;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.gson.JsonObject;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -24,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PopulationByYearAge extends AppCompatActivity {
@@ -40,12 +40,20 @@ TextView textView;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_population_by_year_age);
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor editor = preferences.edit();
+        String agePref = preferences.getString("EditTextAge","");
+        String yearPref = preferences.getString("EditTextYear", "");
         yearEditText = findViewById(R.id.editTextYear);
         ageEditText = findViewById(R.id.editTextAge);
         button = findViewById(R.id.button6);
         countrySpinner = findViewById(R.id.spinner4);
         textView = findViewById(R.id.textView9);
         responseStr = getIntent().getStringExtra("response");
+        ageEditText.setText(agePref);
+        yearEditText.setText(yearPref);
+
+
 
         try{
             JSONObject jsonObject = new JSONObject(responseStr);
@@ -59,17 +67,24 @@ TextView textView;
             String[] array = new String[arrayList.size()];
 
             array = arrayList.toArray(array);
-            //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, array);
+
             loadSpinner(array, countrySpinner);
             System.out.println(jsonArray.toString());
         }
         catch(JSONException e) {
             e.printStackTrace();
         }
+        String position = preferences.getString("SpinnerCountryByAgeYear","");
+        ArrayAdapter arrayAdapter = (ArrayAdapter) countrySpinner.getAdapter();
+
+        int spinnerPosition = arrayAdapter.getPosition(position);
+        countrySpinner.setSelection(spinnerPosition);
+        //ArrayAdapter arrayAdapter = (ArrayAdapter) ageEditText.getAdapter();
         countrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 country = countrySpinner.getSelectedItem().toString();
+                editor.putString("SpinnerCountryByAgeYear", country);
             }
 
             @Override
@@ -83,6 +98,9 @@ TextView textView;
             public void onClick(View v) {
                 age = ageEditText.getText().toString();
                 year = yearEditText.getText().toString();
+
+                editor.putString("EditTextAge", age);
+                editor.putString("EditTextYear", year);
 
                 ageEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
                 yearEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
@@ -114,11 +132,16 @@ TextView textView;
                         try{
                             JSONArray array = new JSONArray(json);
                             JSONObject object = array.getJSONObject(0);
-                            int males = object.getInt("males");
-                            int females = object.getInt("females");
-                            int total = object.getInt("total");
+                            long males = object.getInt("males");
+                            long females = object.getInt("females");
+                            long total = object.getInt("total");
+                            String pattern = "###,###.###";
+                            DecimalFormat decimalFormat = new DecimalFormat(pattern);
+                            String formatMales = decimalFormat.format(males);
+                            String formatFemales = decimalFormat.format(females);
+                            String formatTotal = decimalFormat.format(total);
 
-                            textView.setText("In " + year + " was in " + country + "\n" + males + " males\n" + females + " females\n" + "= " + total + " population " + age +
+                            textView.setText("In " + year + " was in " + country + "\n" + formatMales + " males\n" + formatFemales + " females\n" + "= " + formatTotal + " population " + age +
                                     " years old");
 
                         } catch (JSONException e){

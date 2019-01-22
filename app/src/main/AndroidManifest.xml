@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity"
+            android:label="MAIN MENU"></activity>
         <activity
             android:name=".PopulationByYearAge"
             android:label="By year, age and country"
@@ -24,6 +25,7 @@
         </activity>
         <activity
             android:name=".AgeGender"
+            android:label="Life expectancy"
             android:parentActivityName=".MainActivity">
 
             <!-- The meta-data tag is required if you support API level 15 and lower -->
@@ -33,7 +35,8 @@
         </activity>
         <activity
             android:name=".SpinnerSearch"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:label="Search by country">
 
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data

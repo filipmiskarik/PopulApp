@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.gson.JsonIOException;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -84,7 +83,7 @@ TextView textView;
             String[] array = new String[arrayList.size()];
 
             array = arrayList.toArray(array);
-            //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, array);
+
             loadSpinner(array, countrySpinner);
             System.out.println(jsonArray.toString());
         }
