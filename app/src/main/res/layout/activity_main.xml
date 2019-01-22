@@ -33,8 +33,10 @@
         android:layout_marginTop="8dp"
         android:onClick="GenderAgeIntent"
         android:text="Birthday rank"
-        app:layout_constraintTop_toBottomOf="@+id/button3"
-        tools:layout_editor_absoluteX="140dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button3" />
 
     <Button
         android:id="@+id/button"

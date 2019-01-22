@@ -6,20 +6,22 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PopulationByYearAge"
-            android:parentActivityName=".MainActivity"
-            android:label="By year, age and country">
+        <activity android:name=".Splash_screen"></activity>
+        <activity
+            android:name=".PopulationByYearAge"
+            android:label="By year, age and country"
+            android:parentActivityName=".MainActivity">
 
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-    </activity>
+        </activity>
         <activity
             android:name=".AgeGender"
             android:parentActivityName=".MainActivity">
