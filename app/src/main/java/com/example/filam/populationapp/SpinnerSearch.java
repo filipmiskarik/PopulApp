@@ -1,17 +1,22 @@
 package com.example.filam.populationapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.gson.JsonParser;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -49,7 +54,7 @@ String responseStr;
             JSONObject jsonObject = new JSONObject(responseStr);
             System.out.println(jsonObject.toString());
             JSONArray jsonArray = jsonObject.getJSONArray("countries");
-            ArrayList<String> arrayList = new ArrayList<String>();
+            ArrayList<String> arrayList = new ArrayList<>();
             for(int i = 0; i < jsonArray.length(); i++){
                 System.out.println(jsonArray.get(i).toString());
                 arrayList.add(jsonArray.get(i).toString());
@@ -76,7 +81,6 @@ String responseStr;
                 final String country = spinner.getSelectedItem().toString();
                 tmp = country;
                 editor.putString("SpinnerCountryByCountry", country);
-                System.out.println(country);
                 editor.commit();
             }
             @Override
@@ -84,16 +88,19 @@ String responseStr;
 
             }
         });
+
      button.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
+
              AsyncTask asyncTask = new AsyncTask() {
                  @Override
                  protected Object doInBackground(Object[] objects) {
 
                      OkHttpClient client = new OkHttpClient();
+                     String countryTmp = tmp.replace(" ", "%20");
                      Request request = new Request.Builder()
-                             .url("http://api.population.io:80/1.0/population/"+ tmp +"/"+ date +"/")
+                             .url("http://api.population.io:80/1.0/population/"+ countryTmp +"/"+ date +"/")
                              .build();
                      Response response = null;
 
@@ -117,7 +124,7 @@ String responseStr;
                          JSONObject jsonObject = new JSONObject(json);
                          JSONObject jsonObject1 = jsonObject.getJSONObject("total_population");
                          System.out.println(jsonObject1.toString());
-                         long population = jsonObject1.getInt("population");
+                         long population = jsonObject1.getLong("population");
                          String pattern = "###,###.###";
                          DecimalFormat decimalFormat = new DecimalFormat(pattern);
                          String format = decimalFormat.format(population);

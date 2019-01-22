@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
-            android:label="MAIN MENU"></activity>
+            android:label="Main menu"></activity>
         <activity
             android:name=".PopulationByYearAge"
             android:label="By year, age and country"

@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Splash_screen">
+    tools:context=".Splash_screen"
+    android:background="#FFFFFF">
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@mipmap/icon"/>
+        android:src="@mipmap/api_cb_1"/>
 
 </android.support.constraint.ConstraintLayout>

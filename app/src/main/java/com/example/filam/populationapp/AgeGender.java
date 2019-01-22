@@ -1,6 +1,8 @@
 package com.example.filam.populationapp;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -47,6 +49,10 @@ TextView textView;
         yearSpinner = findViewById(R.id.spinnerYear);
         button = findViewById(R.id.Search);
         textView = findViewById(R.id.result);
+
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor editor = preferences.edit();
+
         System.out.println(responseStr);
         ArrayList<String> tmp = new ArrayList<>();
         System.out.println("ok");
@@ -90,11 +96,38 @@ TextView textView;
         catch(JSONException e) {
             e.printStackTrace();
         }
+        //gender
+        String positionGender = preferences.getString("SpinnerGender","");
+        ArrayAdapter arrayAdapterG = (ArrayAdapter) genderSpinner.getAdapter();
+        int spinnerGenderPosition = arrayAdapterG.getPosition(positionGender);
+        genderSpinner.setSelection(spinnerGenderPosition);
+        //country
+        String positionCountry = preferences.getString("SpinnerCountry1","");
+        ArrayAdapter arrayAdapterC = (ArrayAdapter) countrySpinner.getAdapter();
+        int spinnerCountryPosition = arrayAdapterC.getPosition(positionCountry);
+        countrySpinner.setSelection(spinnerCountryPosition);
+        //day
+        String positionDay = preferences.getString("SpinnerDay", "");
+        ArrayAdapter arrayAdapterD = (ArrayAdapter) daySpinner.getAdapter();
+        int spinnerDayPosition = arrayAdapterD.getPosition(positionDay);
+        daySpinner.setSelection(spinnerDayPosition);
+        //month
+        String positionMonth = preferences.getString("SpinnerMonth", "");
+        ArrayAdapter arrayAdapterM = (ArrayAdapter) monthSpinner.getAdapter();
+        int spinnerMonthPosition = arrayAdapterM.getPosition(positionMonth);
+        monthSpinner.setSelection(spinnerMonthPosition);
+        //year
+        String positionYear = preferences.getString("SpinnerYear", "");
+        ArrayAdapter arrayAdapterY = (ArrayAdapter) yearSpinner.getAdapter();
+        int spinnerYearPosition = arrayAdapterY.getPosition(positionYear);
+        yearSpinner.setSelection(spinnerYearPosition);
 
         genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 gender = genderSpinner.getSelectedItem().toString();
+                editor.putString("SpinnerGender", gender);
+                editor.commit();
             }
 
             @Override
@@ -106,6 +139,8 @@ TextView textView;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 country = countrySpinner.getSelectedItem().toString();
+                editor.putString("SpinnerCountry1", country);
+                editor.commit();
             }
 
             @Override
@@ -117,6 +152,8 @@ TextView textView;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 day = daySpinner.getSelectedItem().toString();
+                editor.putString("SpinnerDay", day);
+                editor.commit();
             }
 
             @Override
@@ -128,6 +165,8 @@ TextView textView;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 month = monthSpinner.getSelectedItem().toString();
+                editor.putString("SpinnerMonth", month);
+                editor.commit();
             }
 
             @Override
@@ -139,6 +178,8 @@ TextView textView;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 year = yearSpinner.getSelectedItem().toString();
+                editor.putString("SpinnerYear", year);
+                editor.commit();
             }
 
             @Override

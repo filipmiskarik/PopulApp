@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -40,20 +42,16 @@ TextView textView;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_population_by_year_age);
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor editor = preferences.edit();
-        String agePref = preferences.getString("EditTextAge","");
-        String yearPref = preferences.getString("EditTextYear", "");
+
         yearEditText = findViewById(R.id.editTextYear);
         ageEditText = findViewById(R.id.editTextAge);
         button = findViewById(R.id.button6);
         countrySpinner = findViewById(R.id.spinner4);
         textView = findViewById(R.id.textView9);
         responseStr = getIntent().getStringExtra("response");
-        ageEditText.setText(agePref);
-        yearEditText.setText(yearPref);
 
-
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor editor = preferences.edit();
 
         try{
             JSONObject jsonObject = new JSONObject(responseStr);
@@ -74,6 +72,12 @@ TextView textView;
         catch(JSONException e) {
             e.printStackTrace();
         }
+
+        String agePref = preferences.getString("EditTextAge","");
+        String yearPref = preferences.getString("EditTextYear", "");
+        ageEditText.setText(agePref);
+        yearEditText.setText(yearPref);
+
         String position = preferences.getString("SpinnerCountryByAgeYear","");
         ArrayAdapter arrayAdapter = (ArrayAdapter) countrySpinner.getAdapter();
 
@@ -84,12 +88,16 @@ TextView textView;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 country = countrySpinner.getSelectedItem().toString();
-                editor.putString("SpinnerCountryByAgeYear", country);
+                final String tmp = country;
+                editor.putString("SpinnerCountryByAgeYear", tmp);
+                editor.commit();
+                if(country == null){
+
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -98,62 +106,69 @@ TextView textView;
             public void onClick(View v) {
                 age = ageEditText.getText().toString();
                 year = yearEditText.getText().toString();
+                int intAge = Integer.parseInt(age);
+                int intYear = Integer.parseInt(year); //&& intYear > 2020 || intAge < 0 && intAge > 150
+                if((intYear < 1949) || (intYear > 2020) ||(intAge < 0) || (intAge > 150)) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Incompatible number range! Use only 1949-2019 for years and 0-150 for age!", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
+                    toast.show();
+                }else{
+                    final String ageTemp = age;
+                    final String yearTemp = year;
+                    editor.putString("EditTextAge", ageTemp);
+                    editor.commit();
+                    editor.putString("EditTextYear", yearTemp);
+                    editor.commit();
 
-                editor.putString("EditTextAge", age);
-                editor.putString("EditTextYear", year);
+                    ageEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                    yearEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-                ageEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
-                yearEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                    AsyncTask asyncTask = new AsyncTask() {
+                        @Override
+                        protected Object doInBackground(Object[] objects) {
+                            OkHttpClient client = new OkHttpClient();
 
-                AsyncTask asyncTask = new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] objects) {
+                            com.squareup.okhttp.Request request = new Request.Builder()
+                                    .url("http://api.population.io:80/1.0/population/"+ year +"/"+ countryTmp +"/" + age + "/")
+                                    .build();
+                            Response response = null;
 
-                        OkHttpClient client = new OkHttpClient();
-                        com.squareup.okhttp.Request request = new Request.Builder()
-                                .url("http://api.population.io:80/1.0/population/"+ year +"/"+ country +"/" + age + "/")
-                                .build();
-                        Response response = null;
-
-                        try{
-                            response = client.newCall(request).execute();
-                            return response.body().string();
+                            try{
+                                response = client.newCall(request).execute();
+                                return response.body().string();
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
+                            return null;
                         }
-                        catch (IOException e)
-                        {
-                            e.printStackTrace();
+                        @Override
+                        protected void onPostExecute(Object o){
+                            String json = o.toString();
+                            try{
+                                JSONArray array = new JSONArray(json);
+                                JSONObject object = array.getJSONObject(0);
+                                long males = object.getInt("males");
+                                long females = object.getInt("females");
+                                long total = object.getInt("total");
+                                String pattern = "###,###.###";
+                                DecimalFormat decimalFormat = new DecimalFormat(pattern);
+                                String formatMales = decimalFormat.format(males);
+                                String formatFemales = decimalFormat.format(females);
+                                String formatTotal = decimalFormat.format(total);
+
+                                textView.setText("In " + year + " was in " + country + "\n" + formatMales + " males\n" + formatFemales + " females\n" + "= " + formatTotal + " population " + age +
+                                        " years old");
+
+                            } catch (JSONException e){
+                                e.printStackTrace();
+                            }
                         }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object o){
-                        String json = o.toString();
-                        try{
-                            JSONArray array = new JSONArray(json);
-                            JSONObject object = array.getJSONObject(0);
-                            long males = object.getInt("males");
-                            long females = object.getInt("females");
-                            long total = object.getInt("total");
-                            String pattern = "###,###.###";
-                            DecimalFormat decimalFormat = new DecimalFormat(pattern);
-                            String formatMales = decimalFormat.format(males);
-                            String formatFemales = decimalFormat.format(females);
-                            String formatTotal = decimalFormat.format(total);
-
-                            textView.setText("In " + year + " was in " + country + "\n" + formatMales + " males\n" + formatFemales + " females\n" + "= " + formatTotal + " population " + age +
-                                    " years old");
-
-                        } catch (JSONException e){
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                }.execute();
+                    }.execute();
+                }
             }
         });
-
     }
     public void loadSpinner(String[] array, Spinner spinner){
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, array);
