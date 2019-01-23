@@ -72,7 +72,6 @@ TextView textView;
         catch(JSONException e) {
             e.printStackTrace();
         }
-
         String agePref = preferences.getString("EditTextAge","");
         String yearPref = preferences.getString("EditTextYear", "");
         ageEditText.setText(agePref);
@@ -91,11 +90,7 @@ TextView textView;
                 final String tmp = country;
                 editor.putString("SpinnerCountryByAgeYear", tmp);
                 editor.commit();
-                if(country == null){
-
-                }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -122,6 +117,7 @@ TextView textView;
 
                     ageEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
                     yearEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
+                    final String countryTmp = country.replace(" ", "&20");
 
                     AsyncTask asyncTask = new AsyncTask() {
                         @Override
